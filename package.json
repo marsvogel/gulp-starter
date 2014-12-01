@@ -1,0 +1,22 @@
+{
+  "name": "gulp-starter",
+  "version": "0.0.0",
+  "description": "Starter Gulp + Browserify project with some common tasks and workflows.",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Christopher Bischoff <chri.bischoff@gmail.com>",
+  "license": "ISC",
+  "devDependencies": {
+    "gulp": "^3.8.7",
+    "gulp-browserify": "^0.5.0",
+    "gulp-imagemin": "^1.0.1",
+    "gulp-ruby-sass": "^0.7.1",
+    "gulp-sourcemaps": "^1.1.1",
+    "gulp-uglify": "^0.3.2",
+    "gulp-watch": "^0.6.9",
+    "gulp.spritesmith": "^1.1.1",
+    "jquery": "^1.11.1"
+  }
+}

@@ -1,0 +1,39 @@
+@mixin sprite-icon {
+    user-select: none;
+    background-color: transparent;
+    background-repeat: no-repeat;
+    background-image: none;
+    display: inline-block;
+    overflow: hidden;
+    font-size: 0;
+    color: transparent;
+    vertical-align: middle;
+    width: 0;
+    height: 0;
+}
+
+.icon {
+    
+    @include sprite-icon;
+    
+    {{#items}}
+
+        &.{{name}} {
+            width: {{px.width}};
+            height: {{px.height}};
+            background-position: {{px.offset_x}} {{px.offset_y}};
+            background-image: url(#{$theme-dir}{{{escaped_image}}}?uuid=#{$uuid});
+        }
+
+    {{/items}}
+}
+
+{{#items}}
+    @mixin icon-{{name}} {
+        @include sprite-icon;
+        width: {{px.width}};
+        height: {{px.height}};
+        background-position: {{px.offset_x}} {{px.offset_y}};
+        background-image: url(#{$theme-dir}{{{escaped_image}}}?uuid=#{$uuid});
+    }
+{{/items}}
