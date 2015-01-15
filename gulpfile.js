@@ -1,12 +1,12 @@
-var gulp = require("gulp");
-var watch = require("gulp-watch");
-var sass = require("gulp-ruby-sass");
-var uglify = require("gulp-uglify");
-var browserify = require("gulp-browserify");
+var gulp        = require("gulp");
+var watch       = require("gulp-watch");
+var sass        = require("gulp-ruby-sass");
+var uglify      = require("gulp-uglify");
+var browserify  = require("gulp-browserify");
 var spritesmith = require('gulp.spritesmith');
-var imagemin = require('gulp-imagemin');
-var uglify = require('gulp-uglify');
-var sourcemaps = require('gulp-sourcemaps');
+var imagemin    = require('gulp-imagemin');
+var uglify      = require('gulp-uglify');
+var sourcemaps  = require('gulp-sourcemaps');
 
 gulp.task('scripts',function(){
     gulp.src(["src/scripts/*.js"])
