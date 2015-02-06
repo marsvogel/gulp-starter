@@ -1,16 +1,16 @@
-var gulp        = require("gulp");
-var watch       = require("gulp-watch");
-var sass        = require("gulp-ruby-sass");
-var uglify      = require("gulp-uglify");
-var browserify  = require("gulp-browserify");
-var spritesmith = require('gulp.spritesmith');
 var browserify  = require('browserify');
 var buffer      = require('vinyl-buffer');
+var gulp        = require('gulp');
 var imagemin    = require('gulp-imagemin');
-var uglify      = require('gulp-uglify');
+var kss         = require('gulp-kss');
+var rename      = require("gulp-rename");
 var sass        = require('gulp-ruby-sass');
 var source      = require('vinyl-source-stream');
 var sourcemaps  = require('gulp-sourcemaps');
+var spritesmith = require('gulp.spritesmith');
+var uglify      = require('gulp-uglify');
+var watch       = require('gulp-watch');
+
 var getBundleName = function () {
     var version = require('./package.json').version;
     var name = require('./package.json').name;
@@ -40,13 +40,29 @@ gulp.task('scripts', function() {
 });
 
 gulp.task('styles', function () {
-    gulp.src("src/styles/**/*.scss")
-        .pipe(sass({
+    return sass(
+        "src/styles/",
+        {
             style: "compressed",
-            sourcemapPath: '../src/styles'
+            sourcemap: true
+        }
+    )
+    .on('error', function (err) { console.error('Error!', err.message); })
+    .pipe(sourcemaps.write())
+    .pipe(gulp.dest("dist/styles"))
+    .pipe(rename(function (path) {
+        path.basename = "style"
+    }))
+    .pipe(gulp.dest("dist/styleguide/public"));
+});
+
+gulp.task('styleguide', function(){
+    gulp.src("src/styles/**/*.scss")
+        .pipe(kss({
+            overview: __dirname + '/src/styles/README.md'
         }))
         .on('error', function (err) { console.log(err.message); })
-        .pipe(gulp.dest("dist/styles"));
+        .pipe(gulp.dest("dist/styleguide"));
 });
 
 gulp.task('sprites', function () {
@@ -78,9 +94,9 @@ gulp.task('img', function() {
 gulp.task('watch', function() {
   gulp.watch("src/scripts/*.js", ['scripts']);
   gulp.watch("src/scripts/**/*.js", ['scripts']);
-  gulp.watch("src/styles/**/*.scss", ['styles']);
+  gulp.watch("src/styles/**/*.scss", ['styles', 'styleguide']);
   gulp.watch("src/sprites/img/*.png", ['sprites']);
   gulp.watch(["src/img/**/*.jpg","src/img/**/*.png"], ['img']);
 });
 
-gulp.task("default",["watch","scripts","styles","sprites","img"]);
+gulp.task("default",["watch","scripts","styles","styleguide","sprites","img"]);

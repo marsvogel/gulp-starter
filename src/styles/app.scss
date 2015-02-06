@@ -1,5 +1,54 @@
-/**
- * Config
+@charset "UTF-8";
+
+/*
+Utils
+
+Gathers all Sass tools and helpers used across the project. Every global variable, function, mixin and placeholder should be put in here.
+
+The rule of thumb for this folder is that it should not output a single line of CSS when compiled on its own. These are nothing but Sass helpers.
+
+See: http://sass-guidelin.es/#utils-folder
+
+Styleguide 1.0
  */
 
-@import "config";
+@import "utils/mixins";
+
+/*
+Base
+
+Holds what we might call the boilerplate code for the project. In there, you might find the reset file, some typographic rules, some standard styles for commonly used HTML elements.
+
+See: http://sass-guidelin.es/#base-folder
+
+Styleguide 2.0
+*/
+
+@import "base/config";
+@import "base/colors";
+@import "base/normalize";
+@import "base/typography";
+
+/*
+Components
+
+For smaller components. While `layout/` is macro (defining the global wireframe), `components/` is more focused on widgets. It contains all kind of specific modules like a slider, a loader, a widget, and basically anything along those lines. There are usually a lot of files in `components/ since the whole site/application should be mostly composed of tiny modules.
+
+See: http://sass-guidelin.es/#components-folder
+
+Styleguide 3.0
+ */
+
+@import "components/buttons";
+
+/*
+Layout
+
+Contains everything that takes part in laying out the site or application. This folder have stylesheets for the main parts of the site (header, footer, navigation, sidebar...), the grid system or even CSS styles for all the forms.
+
+See: http://sass-guidelin.es/#layout-folder
+
+Styleguide 4.0
+ */
+
+@import "layout/navigation";
