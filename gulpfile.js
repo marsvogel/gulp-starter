@@ -1,5 +1,6 @@
 var browserify  = require('browserify');
 var buffer      = require('vinyl-buffer');
+var connect     = require('gulp-connect');
 var gulp        = require('gulp');
 var imagemin    = require('gulp-imagemin');
 var kss         = require('gulp-kss');
@@ -53,7 +54,8 @@ gulp.task('styles', function () {
     .pipe(rename(function (path) {
         path.basename = "style"
     }))
-    .pipe(gulp.dest("dist/styleguide/public"));
+    .pipe(gulp.dest("dist/styleguide/public"))
+    .pipe(connect.reload());
 });
 
 gulp.task('styleguide', function(){
@@ -62,7 +64,15 @@ gulp.task('styleguide', function(){
             overview: __dirname + '/src/styles/README.md'
         }))
         .on('error', function (err) { console.log(err.message); })
-        .pipe(gulp.dest("dist/styleguide"));
+        .pipe(gulp.dest("dist/styleguide"))
+        .pipe(connect.reload());
+});
+
+gulp.task('living-styleguide', function() {
+    connect.server({
+        root: 'dist/styleguide',
+        livereload: true
+    });
 });
 
 gulp.task('sprites', function () {
@@ -95,8 +105,9 @@ gulp.task('watch', function() {
   gulp.watch("src/scripts/*.js", ['scripts']);
   gulp.watch("src/scripts/**/*.js", ['scripts']);
   gulp.watch("src/styles/**/*.scss", ['styles', 'styleguide']);
+  gulp.watch("src/styles/README.md", ['styleguide']);
   gulp.watch("src/sprites/img/*.png", ['sprites']);
   gulp.watch(["src/img/**/*.jpg","src/img/**/*.png"], ['img']);
 });
 
-gulp.task("default",["watch","scripts","styles","styleguide","sprites","img"]);
+gulp.task("default",["watch","scripts","styles","styleguide","sprites","img","living-styleguide"]);
