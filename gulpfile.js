@@ -2,19 +2,24 @@ var browserify  = require('browserify');
 var buffer      = require('vinyl-buffer');
 var connect     = require('gulp-connect');
 var gulp        = require('gulp');
+var gulpif      = require('gulp-if');
 var imagemin    = require('gulp-imagemin');
 var kss         = require('gulp-kss');
 var rename      = require("gulp-rename");
-var sass        = require('gulp-ruby-sass');
+var sass        = require('gulp-sass');
 var source      = require('vinyl-source-stream');
 var sourcemaps  = require('gulp-sourcemaps');
 var spritesmith = require('gulp.spritesmith');
 var uglify      = require('gulp-uglify');
 var watch       = require('gulp-watch');
 
+var pkg         = require('./package.json');
+var settings    = pkg.projectSettings;
+var production  = !!(argv.production); // true if --production flag is used
+
 var getBundleName = function () {
-    var version = require('./package.json').version;
-    var name = require('./package.json').name;
+    var version = pkg.version;
+    var name = pkg.name;
     return version + '.' + name;
 };
 
@@ -26,13 +31,11 @@ gulp.task('scripts', function() {
     });
 
     var bundle = function() {
-        return bundler
-            .bundle()
+        return bundler.bundle()
             .pipe(source(getBundleName() + '.js'))
             .pipe(buffer())
             .pipe(sourcemaps.init({loadMaps: true}))
-            // Add transformation tasks to the pipeline here.
-            .pipe(uglify())
+            .pipe(gulpif(production, uglify()))
             .pipe(sourcemaps.write())
             .pipe(gulp.dest("dist/scripts"));
     };
@@ -41,36 +44,18 @@ gulp.task('scripts', function() {
 });
 
 gulp.task('styles', function () {
-    return sass(
-        "src/styles/",
-        {
-            style: "compressed",
-            sourcemap: true
-        }
-    )
-    .on('error', function (err) { console.error('Error!', err.message); })
+
+    return gulp.src('src/styles/*.scss')
+    .pipe(sourcemaps.init())
+    .pipe(sass({outputStyle: production ? "compressed" : "nested"}))
     .pipe(sourcemaps.write())
     .pipe(gulp.dest("dist/styles"))
-    .pipe(rename(function (path) {
-        path.basename = "style"
-    }))
-    .pipe(gulp.dest("dist/styleguide/public"))
     .pipe(connect.reload());
 });
 
-gulp.task('styleguide', function(){
-    gulp.src("src/styles/**/*.scss")
-        .pipe(kss({
-            overview: __dirname + '/src/styles/README.md'
-        }))
-        .on('error', function (err) { console.log(err.message); })
-        .pipe(gulp.dest("dist/styleguide"))
-        .pipe(connect.reload());
-});
-
-gulp.task('living-styleguide', function() {
+gulp.task('server', function() {
     connect.server({
-        root: 'dist/styleguide',
+        root: settings.server.root,
         livereload: true
     });
 });
@@ -85,6 +70,7 @@ gulp.task('sprites', function () {
         imgPath: "/dist/img/sprite.png",
         cssTemplate: "src/sprites/sprite.scss.mustache"
     }));
+
     spriteData.img
         .pipe(gulp.dest("src/img"));
     spriteData.css
@@ -102,12 +88,15 @@ gulp.task('img', function() {
 });
 
 gulp.task('watch', function() {
-  gulp.watch("src/scripts/*.js", ['scripts']);
-  gulp.watch("src/scripts/**/*.js", ['scripts']);
-  gulp.watch("src/styles/**/*.scss", ['styles', 'styleguide']);
-  gulp.watch("src/styles/README.md", ['styleguide']);
-  gulp.watch("src/sprites/img/*.png", ['sprites']);
-  gulp.watch(["src/img/**/*.jpg","src/img/**/*.png"], ['img']);
+    gulp.watch("src/scripts/*.js", ['scripts']);
+    gulp.watch("src/scripts/**/*.js", ['scripts']);
+
+    gulp.watch("src/styles/**/*.scss", ['styles']);
+    gulp.watch("src/styles/*.scss", ['styles']);
+
+    gulp.watch("src/sprites/img/*.png", ['sprites']);
+
+    gulp.watch(["src/img/**/*.jpg","src/img/**/*.png"], ['img']);
 });
 
-gulp.task("default",["watch","scripts","styles","styleguide","sprites","img","living-styleguide"]);
+gulp.task("default",["watch","scripts","styles","sprites","img","server"]);
